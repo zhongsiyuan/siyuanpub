@@ -174,6 +174,56 @@ function setupHelp() {
 setupHelp();
 ```
 
+### 变量对象 作用域链 执行上下文 This
+
+当 JavaScript 代码执行一段可执行代码(executable code)时，会创建对应的执行上下文(execution context)。
+
+对于每个执行上下文，都有三个重要属性：
+
+- 变量对象(Variable object，VO)
+- 作用域链(Scope chain)
+- this
+今天重点讲讲创建变量对象的过程。
+
+```javascript
+var scope = "global scope";
+function checkscope(){
+    var scope = "local scope";
+    function f(){
+        return scope;
+    }
+    return f();
+}
+checkscope();
+var scope = "global scope";
+function checkscope(){
+    var scope = "local scope";
+    function f(){
+        return scope;
+    }
+    return f;
+}
+checkscope()();
+```
+
+让我们模拟第一段代码：
+
+```text
+ECStack.push(<checkscope> functionContext);
+ECStack.push(<f> functionContext);
+ECStack.pop();
+ECStack.pop();
+```
+
+让我们模拟第二段代码：
+
+```text
+ECStack.push(<checkscope> functionContext);
+ECStack.pop();
+ECStack.push(<f> functionContext);
+ECStack.pop();
+```
+
 以下代码输出什么？为什么？
 ```javascript
 const fn1 = function fn2() {}

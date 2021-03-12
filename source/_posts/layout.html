@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<input type="text" data-model="name">
+<input type="text" data-model="name">
+<p data-bind="name"></p>
+</body>
+<script>
+  const inputs = document.querySelectorAll("input[data-model='name']");
+  const texts = document.querySelectorAll("p[data-bind='name']");
+  const data = {
+    name: null,
+  };
+  let value = null;
+  Object.defineProperty(data, 'name', {
+    get() {
+      return value;
+    },
+    set(newValue) {
+      if (value !== newValue) {
+        value = newValue;
+        inputs.value = newValue;
+        document.querySelector("p[data-bind='name']").innerText = newValue;
+      }
+    },
+  });
+
+  document.querySelector("input[data-model='name']").addEventListener('keyup', (e) => {
+    data.name = e.target.value;
+  });
+</script>
+</html>
