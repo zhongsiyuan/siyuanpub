@@ -62,7 +62,10 @@ exclude: null
 ignore: null
 theme: icarus
 deploy:
-  type: ''
+  type: git
+  repo:
+    github: https://github.com/zhongsiyuan/blog.git
+  branch: master
 widgets:
   - type: profile
     position: left
