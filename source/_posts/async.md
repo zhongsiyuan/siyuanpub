@@ -1,49 +1,46 @@
-### 通过babel-polyfill理解await工作原理
+---
+title: 通过BabelPolyfill理解Await工作原理
+---
  
-现今前端工程实践中，es6+大行其道。
+现今前端工程实践中，由于Babel的出现，各种ES的新特性大行其道。
 
-异步逻辑处理过程也由最初的callback思想，再过渡到promise方案，再到如今最流行的async/await语法。
+处理异步逻辑的方式也由最初的Callback思想，过渡到Promise方案，再到如今最流行的Async/Await。
 
+实际上，根据Promise A+规范说明，Promise也是Callback方案，不少社区开发者声称Async/Await是Promise的语法糖，事实如此吗？
+
+我们今天使用BabelPolyfill和一个简单的用例，将代码转为支持Chrome54版本的语法*注(Chrome54不支持Async/Await)，来进一步验证Async/Await的内部原理。
 
 ```javascript
 async function main() {
     console.log('main-env');
-    try {
-        const result = await sleeper();
-        console.log(result, 'result');
-    } catch (e) {
-        console.error(e);
-    } finally {
-        console.log('something...');
-    }
+    const fn1Result = await fn1();
+    console.log(fn1Result, 'fn1Result');
+    const fn2Result = await fn2();
+    console.log(fn2Result, 'fn2Result');
 }
 
-async function sleeper() {
-    console.log('sleeper-env');
-    return new Promise((resolve, reject) => {
-       try {
-           console.log('sleeper-promise-env');
-           setTimeout(() => {
-               console.log('sleeper-promise-timer-env');
-               resolve('success');
-           });
-       } catch (e) {
-           reject(e);
-       }
-    });
+function fn1() {
+    console.log('fn1-env');
+    return 'success-fn1';
+}
+
+async function fn2() {
+    console.log('fn2-env');
+    return 'success-fn2';
 }
 
 main();
 console.log('global-env');
+
 ```
 
 ```javascript
-import 'core-js/modules/es6.object.to-string.js';
-
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
   try {
     var info = gen[key](arg);
     var value = info.value;
+
+    console.log(info, arguments);
   } catch (error) {
     reject(error);
     return;
@@ -83,42 +80,41 @@ function main() {
 function _main() {
   _main = _asyncToGenerator(function* () {
     console.log('main-env');
-
-    try {
-      const result = yield sleeper();
-      console.log(result, 'result');
-    } catch (e) {
-      console.error(e);
-    } finally {
-      console.log('something...');
-    }
+    const fn1Result = yield fn1();
+    console.log(fn1Result, 'fn1Result');
+    const fn2Result = yield fn2();
+    console.log(fn2Result, 'fn2Result');
   });
   return _main.apply(this, arguments);
 }
 
-function sleeper() {
-  return _sleeper.apply(this, arguments);
+function fn1() {
+  console.log('fn1-env');
+  return 'success-fn1';
 }
 
-function _sleeper() {
-  _sleeper = _asyncToGenerator(function* () {
-    console.log('sleeper-env');
-    return new Promise((resolve, reject) => {
-      try {
-        console.log('sleeper-promise-env');
-        setTimeout(() => {
-          console.log('sleeper-promise-timer-env');
-          resolve('success');
-        });
-      } catch (e) {
-        reject(e);
-      }
-    });
+function fn2() {
+  return _fn.apply(this, arguments);
+}
+
+function _fn() {
+  _fn = _asyncToGenerator(function* () {
+    console.log('fn2-env');
+    return 'success-fn2';
   });
-  return _sleeper.apply(this, arguments);
+  return _fn.apply(this, arguments);
 }
 
 main();
 console.log('global-env');
 //# sourceMappingURL=async-post.es.js.map
+
 ```
+
+通过上述代码可以看出，实际Async/Await是使用Generator + Promise，通过递归不停的调用Generator中的Next函数，直到返回Done。
+
+那么处在每个被Yield关键字描述的语句的上一段落，就会逐行执行。如果被Yield关键字描述的方法中依旧存在异步内容，则再次被压入执行栈中并执行。
+
+所以我们可以认为，被Await关键字描述的语句后的段落，实际上相当于书写在Promise.then中。
+
+并且，查看被babel重新编译后的代码，对比函数fn1与async fn2可以看出，一个被Async关键字描述的方法，则一定会返回一个Promise。
