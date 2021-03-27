@@ -8,3 +8,5 @@
 - fetch/ajax区别
 - 算法与数据结构
 - 微前端解决方案/iframe/qiankun
+- 设计模式
+- TS
