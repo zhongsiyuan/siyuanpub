@@ -1,9 +1,14 @@
 ---
 title: 深入剖析原型与原型链
+categories: JavaScriptBasic
+tags: prototype
+date: 2021-03-25 11:14:28
 ---
 MDN对JavaScript的描述是 基于原型 的脚本语言。
 
 熟悉前端领域的同学们应该都听说过原型和原型链的概念，出于学习交流的目的，这篇文章用于梳理笔者对原型/原型链的个人理解。
+
+<!--more-->
 
 首先需要明确的是：在JavaScript中，我们认为一切都是对象实例。关于这段话的解释如下：
 ```javascript
@@ -69,4 +74,4 @@ JavaScript在访问实例自身属性/方法时，如果不存在该属性/方�
 
 ### 原型链图解
 
-![原型](../images/prototype/1.png)
+![原型](/images/prototype/1.png)

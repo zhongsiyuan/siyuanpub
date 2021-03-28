@@ -1,5 +1,7 @@
 ---
 title: 通过BabelPolyfill理解Await工作原理
+categories: JavaScriptBasic
+tags: async
 ---
  
 现今前端工程实践中，由于Babel的出现，各种ES的新特性大行其道。
@@ -7,6 +9,8 @@ title: 通过BabelPolyfill理解Await工作原理
 处理异步逻辑的方式也由最初的Callback思想，过渡到Promise方案，再到如今最流行的Async/Await。
 
 实际上，根据Promise A+规范说明，Promise也是Callback方案，不少社区开发者声称Async/Await是Promise的语法糖，事实如此吗？
+
+<!--more-->
 
 我们今天使用BabelPolyfill和一个简单的用例，将代码转为支持Chrome54版本的语法*注(Chrome54不支持Async/Await)，来进一步验证Async/Await的内部原理。
 
