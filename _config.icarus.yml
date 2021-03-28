@@ -3,11 +3,11 @@ version: 4.0.0
 # Icarus theme variant, can be "default" or "cyberpunk"
 variant: default
 # Path or URL to the website's logo
-logo: /img/logo.svg
+logo: /images/logo.png # /img/logo.svg
 # Page metadata configurations
 head:
     # URL or path to the website's icon
-    favicon: /img/favicon.svg
+    favicon: /images/favicon.ico
     # Web application manifests configuration
     # https://developer.mozilla.org/en-US/docs/Web/Manifest
     manifest:
@@ -103,7 +103,7 @@ navbar:
         归档: /archives
         分类: /categories
         标签: /tags
-        关于: /about
+        # 关于: /about
     # Links to be shown on the right of the navigation bar
     links:
         GitHub:
@@ -160,7 +160,7 @@ comment:
 # https://ppoffice.github.io/hexo-theme-icarus/categories/Plugins/Donation/
 donates:
     # "Afdian.net" donate button configurations
-    -
+    # -
         # type: afdian
         # URL to the "Afdian.net" personal page
         # url: ''
@@ -170,17 +170,17 @@ donates:
         # Alipay qrcode image URL
         qrcode: 'images/alipay.png'
     # "Buy me a coffee" donate button configurations
-    -
+    # -
         # type: buymeacoffee
         # URL to the "Buy me a coffee" page
         # url: ''
     # Patreon donate button configurations
-    -
+    # -
         # type: patreon
         # URL to the Patreon page
         # url: ''
     # Paypal donate button configurations
-    -
+    # -
         # type: paypal
         # Paypal business ID or email address
         # business: 'ipresk@live.com'
@@ -223,7 +223,7 @@ widgets:
         # Author's current location
         location: Earth, Solar System
         # URL or path to the avatar image
-        avatar: images/avatar.png
+        avatar: images/avatar.jpg
         #avatar: https://octodex.github.com/images/hula_loop_octodex03.gif
         # Whether show the rounded avatar image
         avatar_rounded: true
