@@ -12,7 +12,7 @@ date: 2021-03-25 11:14:28
 ## 概述
 
 在深入探讨TurboFan的工作原理之前，我将会简单解释V8是如何在上层工作的。让我们看一下V8的简化细分（摘自我的同事Addy Osmani的“ JavaScript Start-up Performance”博客文章）：
-![V8工作方式](../images/optimization4v8/how_v8_work.png)
+![V8工作方式](source/images/optimization4v8/how_v8_work.png)
 
 每当Chrome或Node.js执行一段JavaScript时，它将源代码传递给V8。V8接收该JavaScript源代码并将其提供给所谓的Parser，后者为您的源代码创建一个抽象语法树（AST）的描述。然后将AST传递到Ignition解释器上，在该解释器上将其转换为字节码序列。然后，该字节码序列由Ignition执行。
 
@@ -34,7 +34,7 @@ console.log(add(1, 2));
 
 如果您在如果您在Chrome DevTools的控制台中运行此命令，则会看到它输出了预期的结果3：
 
-![Chrome开发者工具](../images/optimization4v8/run_add_in_chrome.png)
+![Chrome开发者工具](source/images/optimization4v8/run_add_in_chrome.png)
 
 让我们看看在V8引擎下发生了什么，以便获得实际的结果。我们将逐步执行add函数。正如上面所提到的那样，我们首先需要解析函数源码并将其转换为抽象语法树（AST），这是由解析器去完成的。您可以在d8 shell的调试构建中输入--print-ast参数看到V8内部生成的AST。
 
@@ -56,7 +56,7 @@ FUNC at 12
 
 这种格式不太易用，所以让我们将它可视化。
 
-![AST](../images/optimization4v8/ast_visualize.png)
+![AST](source/images/optimization4v8/ast_visualize.png)
 
 最初，add函数字面量被解析为一个树形的表达，其中一个子树用于参数声明，一个子树用于实际函数体。在解析过程中，很难分辨出哪个名称对应于程序中的哪些变量，这主要是由于JavaScript中有趣的var提升和eval，但也有其他原因。因此，对于每个名称，解析器最初都会创建所谓的VAR代理（VAR PROXY）节点。随后的作用域解析步骤将这些VAR代理节点连接到声明的VAR节点，或将它们标记为全局或动态查找，这取决于解析器是否在周围的其中任一作用域中看到了eval表达式。
 
@@ -86,7 +86,7 @@ Return
 
 为了解释这一点，我们首先需要了解解释器是如何在上层工作的。Ignition使用所谓的寄存器机（与FullCodegen编译器中早期V8版本使用的堆栈机方法不同）。它将其本地状态保存在解释器寄存器中，其中一些映射到实际的CPU寄存器，而另一些则映射到本机栈内存中的特定插槽。
 
-![解释器概述](../images/optimization4v8/interpreter_overview.png)
+![解释器概述](source/images/optimization4v8/interpreter_overview.png)
 
 特殊寄存器a0和a1对应于堆栈机器上函数的形参（在本例中，我们有两个形参）。形参是源代码中声明的参数，可能与运行时传递给函数的实参不同。每个字节码的最后计算值通常保存在称为累加器（accumulator）的特殊寄存器中，当前栈帧或激活记录由栈指针标识，并且程序计数器指向字节码中当前执行的指令。让我们检查一下本例中各个字节码都做了些什么：
 
@@ -103,7 +103,7 @@ Return
 
 仅仅在几条机器指令中就可以实现峰值性能（与Java/C++相媲美），这里的神奇之处就是推测优化，它通过假设可能的输入。例如，当我们知道在x+y的情况下，x和y都是数字时，我们不需要处理其中任何一个都是字符串的情况或是更糟的情况--操作数可以是任意的JavaScript对象，我们需要首先对其运行抽象操作ToPrimitive。
 
-![基本操作](../images/optimization4v8/to_primitive_operation.png)
-![闭包结构](../images/optimization4v8/closure_structure.png)
+![基本操作](source/images/optimization4v8/to_primitive_operation.png)
+![闭包结构](source/images/optimization4v8/closure_structure.png)
 
 知道x和y都是数字也意味着我们可以排除可观察到的副作用-例如，我们知道它不能关闭计算机、写入文件或导航到不同的页面。此外，我们知道该操作不会引发异常。这两个对于优化都很重要，因为优化编译器只有在确定表达式不会引起任何可观察的副作用并且不会引发异常的情况下才能消除表达式。
